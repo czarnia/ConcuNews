@@ -15,3 +15,4 @@ server: server.c $(DEPS)
 
 clean:
 	rm -f *.o
+	rm server

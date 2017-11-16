@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#include <stdio.h>
+
 
 
 #define SERVER_IP "127.0.0.1"
@@ -20,6 +22,36 @@ void new_client() {
 
 
 int main(int argc, char* argv[]) {
+	getc(stdin);
+	printf("Creating socket\n");
+	socket_t* s = socket_create(SOCK_PASSIVE);
 
+	printf("Binding socket\n");
+	int err = socket_bind(s, SERVER_IP, SERVER_PORT);
+	if (err < 0) {
+		printf("Binding failed: %d\n", err);
+		socket_destroy(s);
+		return -1;
+	}
+
+	printf("Setting socket as passive\n");
+	err = socket_listen(s, 0);
+	if (err < 0) {
+		printf("Listen failed: %d\n", err);
+		socket_destroy(s);
+		return -1;
+	}
+
+	printf("Listening on socket %s:%s\n", SERVER_IP, SERVER_PORT);
+	socket_t* s2 = socket_accept(s);
+	if (!s2) {
+		printf("Accept failed\n");
+	} else {
+		printf("Accept successful!\n");
+		getc(stdin);
+		socket_destroy(s2);
+	}
+
+	socket_destroy(s);
 	return 0;
 }

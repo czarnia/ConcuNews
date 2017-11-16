@@ -13,11 +13,15 @@
 
 #include "socket.h"
 
+#define BACKLOG_DEFAULT 10
+
+const struct sockaddr SA_ZERO = {};
+
 struct socket {
 	int sock;
 	socket_type type;
 	struct addrinfo* ai;
-	struct addrinfo* peer_ai;
+	struct sockaddr peer_sa;
 };
 
 
@@ -52,8 +56,9 @@ int init_addrinfo(struct addrinfo** ai_store, char* hostname, char* service) {
  */
 socket_t* socket_create(socket_type type) {
 	socket_t* sock = malloc(sizeof(socket_t));
+	if (!sock) return NULL;
 	sock->ai = NULL;
-	sock->peer_ai = NULL;
+	sock->peer_sa = SA_ZERO;
 	sock->type = type;
 	sock->sock = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -69,8 +74,6 @@ socket_t* socket_create(socket_type type) {
  */
 void socket_destroy(socket_t* self) {
 	if (self->ai)
-		freeaddrinfo(self->ai);
-	if (self->peer_ai)
 		freeaddrinfo(self->ai);
 	close(self->sock);
 	free(self);
@@ -96,17 +99,41 @@ int socket_bind(socket_t* self, char* hostname, char* port){
 }
 
 
-
-int socket_listen(socket_t* self, int conexiones){
+/*
+ * Puts a passive socket in a state ready to accept incomming connections.
+ * Will fail if the socket is not set to be SOCK_PASSIVE.
+ * The backlog argument defines the maximum length of the pending connection queue.
+ * If set to 0 it is defaulted to BACKLOG_DEFAULT.
+ */
+int socket_listen(socket_t* self, int backlog) {
 	assert(self->type = SOCK_PASSIVE);
-	return listen(self->sock, conexiones);
+	if (!backlog) backlog = BACKLOG_DEFAULT;
+	return listen(self->sock, backlog);
 }
 
 
-int socket_accept(socket_t* self, struct sockaddr* dir_cliente, socket_t* sock){
+/*
+ * Blocks until a new connection is established and then retunrs a new to a new socket
+ * representing the connection. The self socket is unnafected an remains in listening state.
+ * Function socket_listen() must be called before socket_accept(), and the socket must be bound.
+ */
+socket_t* socket_accept(socket_t* self) {
 	assert(self->type = SOCK_PASSIVE);
-	socklen_t tam_addr = sizeof(dir_cliente);
-	return sock->sock = accept(self->sock, dir_cliente, &tam_addr);
+
+	socket_t* new_sock = malloc(sizeof(socket_t));
+	if (!new_sock) return NULL;
+	new_sock->ai = NULL;
+	new_sock->peer_sa = SA_ZERO;
+	new_sock->type = self->type;
+
+	socklen_t addrlen = sizeof(new_sock->peer_sa);
+	new_sock->sock = accept(self->sock, &new_sock->peer_sa, &addrlen);
+
+	if (new_sock->sock < 0) {
+		free(new_sock);
+		new_sock = NULL;
+	}
+	return new_sock;
 }
 
 int socket_conect(socket_t* self){
