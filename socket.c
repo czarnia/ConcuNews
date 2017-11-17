@@ -5,7 +5,6 @@
 #include <unistd.h>
 #include <netinet/in.h>
 #include <netdb.h>
-#include <arpa/inet.h>	// htons, htonl, etc
 #include <string.h>	// memset
 #include <stdlib.h>
 
@@ -92,12 +91,13 @@ int socket_bind(socket_t* self, char* hostname, char* port){
 
 	// TODO: assert addrinfo is correct type and family
 	err = bind(self->sock, self->ai->ai_addr, self->ai->ai_addrlen);
-	if (err)
+	if (err) {
 		freeaddrinfo(self->ai);
+		self->ai = NULL;
+	}
 
 	return err;
 }
-
 
 /*
  * Puts a passive socket in a state ready to accept incomming connections.
@@ -110,7 +110,6 @@ int socket_listen(socket_t* self, int backlog) {
 	if (!backlog) backlog = BACKLOG_DEFAULT;
 	return listen(self->sock, backlog);
 }
-
 
 /*
  * Blocks until a new connection is established and then retunrs a new to a new socket
@@ -154,7 +153,10 @@ int socket_conect(socket_t* self, char* hostname, char* port) {
 	return err;
 }
 
-
+/*
+ * Continously reads bytes from socket in a blocking fashion, until size bytes are
+ * read or an error occurs. Read bytes are stored on buffer.
+ */
 int socket_receive(socket_t* self, char* buffer, size_t size) {
 	size_t acum= 0;
 	int rcv = 0;
@@ -169,11 +171,13 @@ int socket_receive(socket_t* self, char* buffer, size_t size) {
 		}
 		acum += rcv;
 	}
-
 	return acum;
 }
 
-
+/*
+ * Continously write bytes to a socket, until size bytes are writen
+ * or an error occurs.
+ */
 int socket_send(socket_t* self, const char* buffer, size_t size) {
 	size_t acum = 0;
 	int snd = 0;
@@ -186,6 +190,5 @@ int socket_send(socket_t* self, const char* buffer, size_t size) {
 		}
 		acum += snd;
 	}
-
 	return acum;
 }

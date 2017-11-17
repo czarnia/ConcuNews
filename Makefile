@@ -1,12 +1,13 @@
 GCC := gcc
 CFLAGS := -std=c99 -g -Wall
 
-DEPS := socket.o
+SERVERS := echo
+DEPS := socket.o server.o
 
 
 .PHONY: clean
 
-server: server.c $(DEPS)
+echo: $(DEPS) echo.c
 	$(GCC) $(CFLAGS) $^ -o $@
 
 %.o: %.c %.h
@@ -15,4 +16,4 @@ server: server.c $(DEPS)
 
 clean:
 	rm -f *.o
-	rm server
+	rm echo 
