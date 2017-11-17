@@ -1,11 +1,12 @@
 GCC := gcc
 CFLAGS := -std=c99 -g -Wall
+VFLAGS := --leak-check=full --track-origins=yes --show-leak-kinds=all
 
 SERVERS := echo
 DEPS := socket.o server.o
 
 
-.PHONY: clean
+.PHONY: clean valgrind
 
 echo: $(DEPS) echo.c
 	$(GCC) $(CFLAGS) $^ -o $@
@@ -13,6 +14,8 @@ echo: $(DEPS) echo.c
 %.o: %.c %.h
 	$(GCC) $(CFLAGS) -c $^
 
+valgrind: echo
+	valgrind $(VFLAGS) ./echo
 
 clean:
 	rm -f *.o
