@@ -136,45 +136,56 @@ socket_t* socket_accept(socket_t* self) {
 	return new_sock;
 }
 
-int socket_conect(socket_t* self){
+/*
+ * Attemps to connect to the hostname and port passed as parameters.
+ * Socket must be SOCK_ACTIVE to be able to start a connection.
+ */
+int socket_conect(socket_t* self, char* hostname, char* port) {
 	assert(self->type = SOCK_ACTIVE);
-	return connect(self->sock, self->ai->ai_addr, self->ai->ai_addrlen);
+
+	struct addrinfo* ai;
+	int err = init_addrinfo(&ai, hostname, port);
+	if (err)
+		return err;
+
+	err = connect(self->sock, ai->ai_addr, ai->ai_addrlen);
+
+	freeaddrinfo(ai);
+	return err;
 }
 
 
-int socket_receive(socket_t* self, char* buffer, size_t tamanio){
-	size_t tam_actual = 0; //el tamaño total de lo que ya recibí.
-	int tam_rcv = 0; //el tamaño de lo que recibo en cada ciclo.
+int socket_receive(socket_t* self, char* buffer, size_t size) {
+	size_t acum= 0;
+	int rcv = 0;
 
-	while (tam_actual < tamanio){
-		int dif_tam = tamanio-tam_actual;
-		tam_rcv = recv(self->sock, &buffer[tam_actual], dif_tam, MSG_NOSIGNAL);
-		if (tam_rcv <= 0){
+	while (acum < size) {
+		int diff = size - acum;
+		rcv = recv(self->sock, &buffer[acum], diff, MSG_NOSIGNAL);
+		if (rcv < 0) {
 			return -1;
+		} else if (rcv == 0) {
+			return acum;
 		}
-		tam_actual += tam_rcv;
+		acum += rcv;
 	}
 
-	return tam_actual;
+	return acum;
 }
 
 
-int socket_send(socket_t* self, const char* buffer, size_t tamanio){
-	size_t tam_actual = 0; //el tamaño total de lo que ya envié.
-	int tam_send = 0; //el tamaño de lo que envio en cada ciclo.
+int socket_send(socket_t* self, const char* buffer, size_t size) {
+	size_t acum = 0;
+	int snd = 0;
 
-	while (tam_actual < tamanio){
-		int dif_tam = tamanio-tam_actual;
-		tam_send = send(self->sock, &buffer[tam_actual], dif_tam, MSG_NOSIGNAL);
-		if (tam_send <= 0){
+	while (acum < size) {
+		int diff = size - acum;
+		snd = send(self->sock, &buffer[acum], diff, MSG_NOSIGNAL);
+		if (snd <= 0){
 			return -1;
 		}
-		tam_actual += tam_send;
+		acum += snd;
 	}
 
-	return tam_actual;
-}
-
-int socket_shutdown(socket_t* self, int como){
-	return shutdown (self->sock, como);
+	return acum;
 }

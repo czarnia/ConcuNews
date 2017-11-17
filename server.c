@@ -13,9 +13,18 @@
 
 
 
-void new_client() {
+void new_client(socket_t* s) {
+	char c = 'a';
+	int err = 0;
+	while (c != 'q') {
+		err = socket_receive(s, &c, 1);
+		printf("%c - %d\n", c, err);
+		if (err < 0) return;
 
-	_exit(0);
+		err = socket_send(s, &c, 1);
+		printf("%c - %d\n", c, err);
+		if (err < 0) return;
+	}
 }
 
 
@@ -49,6 +58,7 @@ int main(int argc, char* argv[]) {
 	} else {
 		printf("Accept successful!\n");
 		getc(stdin);
+		new_client(s2);
 		socket_destroy(s2);
 	}
 

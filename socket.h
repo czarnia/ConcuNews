@@ -35,7 +35,7 @@ int socket_bind(socket_t* self, char* hostname, char* port);
 socket_t* socket_accept(socket_t* self);
 
 //Hace un conect del socket, devuelve <0 en caso de error
-int socket_conect(socket_t* self);
+int socket_conect(socket_t* self, char* hostname, char* port);
 
 //Hace un receive del socket, determinando cuanta informacion se piensa recibir
 //, devuelve <0 en caso de error
@@ -44,9 +44,6 @@ int socket_receive(socket_t* self, char* buffer, size_t tamanio);
 //Hace un send del socket, determinando cuanta informacion se piensa enviar,
 //devuelve <0 en caso de error
 int socket_send(socket_t* self, const char* buffer, size_t tamanio);
-
-//Le hace un shutdown a un socket_t*, devuelve <0 en caso de error
-int socket_shutdown(socket_t* self, int como);
 
 
 #endif // _SOCKET_H
