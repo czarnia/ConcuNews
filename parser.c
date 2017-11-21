@@ -17,7 +17,8 @@
 
 void read_line(FILE* f, char* line){
     char c = getc(f);
-    for (int i = 0; i < MAX_SIZE && c != END_LINE; i++){
+    int i = 0;
+    for (i; i < MAX_SIZE && c != END_LINE; i++){
         if (c == EOF){
             line[i] = END_STRING;
             return;
@@ -25,13 +26,30 @@ void read_line(FILE* f, char* line){
         line[i] = c;
         c = getc(f);
     }
-    line[MAX_SIZE] = END_STRING;
+    line[i] = END_STRING;
 }
 
-void split_values(char* line, char* separator, char** values){
-    for (int i = 0; i < NUM_VALUES; i++){
-        values[i] = strsep(&line, separator);
+void split_values(char* line, char separator, char** values){
+    char str[MAX_STRING_SIZE];
+    int j = 0;
+    int size_str = 0;
+    for (int i = 0; i < strlen(line); i++){
+        if (line[i] == separator){
+            str[size_str] = END_STRING;
+            char str_aux[size_str];
+            strcpy(str_aux, str);
+            strcpy(values[j], str_aux);
+            size_str = 0;
+            j++;
+        }else{
+            str[size_str] = line[i];
+            size_str++;
+        }
     }
+    str[size_str] = END_STRING;
+    char str_aux[size_str];
+    strcpy(str_aux, str);
+    strcpy(values[j], str_aux);
 }
 
 //------------------------------------------------------------------------------//
@@ -50,12 +68,17 @@ city_vector_t* get_cities(char* cities_file){
     int i = 0;
     char line[MAX_SIZE];
     read_line(f, line);
+    printf("%s\n", line);
 
     while(line){
         char* processed_line[NUM_VALUES];
-        split_values(line, " ", processed_line);
-        char* city_name = processed_line[0];
-        float value = atof(processed_line[1]);
+        split_values(line, ' ', processed_line);
+        char city_name[MAX_STRING_SIZE];
+        char value_str[MAX_STRING_SIZE];
+        strcpy(city_name, processed_line[0]);
+        strcpy(value_str, processed_line[1]);
+
+        float value = atoi(value_str);
 
         city_t city = city_create(city_name, value);
         if (!city_vector_add(cities, city)){
@@ -83,5 +106,5 @@ void store_cities(city_vector_t* cities, char* cities_file){
         fwrite(line, sizeof(char), strlen(line), f);
     }
 
-    city_vector_destroy(cities);
+    //city_vector_destroy(cities);
 }
