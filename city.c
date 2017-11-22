@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 
 #define INI_SIZE 5
 
@@ -15,7 +16,9 @@ city_t city_create(char* name, float value){
 }
 
 char* city_name(city_t city){
-    return city.name;
+    static char str_aux[66];
+    strcpy(str_aux, city.name);
+    return str_aux;
 }
 
 float city_value(city_t city){
@@ -33,13 +36,13 @@ city_vector_t* city_vector_create(){
     if (!vector->vec){
         return NULL;
     }
-    vector->size = 0;
+    vector->size = INI_SIZE;
     vector->quantity = 0;
     return vector;
 }
 
-size_t city_vector_size(city_vector_t* v){
-    return v->size;
+size_t city_vector_quantity(city_vector_t* v){
+    return v->quantity;
 }
 
 city_t city_vector_get(city_vector_t* v, size_t i){
@@ -55,6 +58,7 @@ bool city_vector_add(city_vector_t* v, city_t city){
         v->vec = new_vec;
     }
     v->vec[v->quantity] = city;
+    v->quantity++;
     return true;
 }
 

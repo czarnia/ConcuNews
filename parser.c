@@ -29,16 +29,14 @@ void read_line(FILE* f, char* line){
     line[i] = END_STRING;
 }
 
-void split_values(char* line, char separator, char** values){
+void split_values(char* line, char separator, char* city_name, char* city_value){
     char str[MAX_STRING_SIZE];
     int j = 0;
     int size_str = 0;
     for (int i = 0; i < strlen(line); i++){
         if (line[i] == separator){
             str[size_str] = END_STRING;
-            char str_aux[size_str];
-            strcpy(str_aux, str);
-            strcpy(values[j], str_aux);
+            strcpy(city_name, str);
             size_str = 0;
             j++;
         }else{
@@ -47,9 +45,7 @@ void split_values(char* line, char separator, char** values){
         }
     }
     str[size_str] = END_STRING;
-    char str_aux[size_str];
-    strcpy(str_aux, str);
-    strcpy(values[j], str_aux);
+    strcpy(city_value, str);
 }
 
 //------------------------------------------------------------------------------//
@@ -68,15 +64,11 @@ city_vector_t* get_cities(char* cities_file){
     int i = 0;
     char line[MAX_SIZE];
     read_line(f, line);
-    printf("%s\n", line);
 
-    while(line){
-        char* processed_line[NUM_VALUES];
-        split_values(line, ' ', processed_line);
+    while((line) && (strcmp(line, "\0") != 0)){
         char city_name[MAX_STRING_SIZE];
         char value_str[MAX_STRING_SIZE];
-        strcpy(city_name, processed_line[0]);
-        strcpy(value_str, processed_line[1]);
+        split_values(line, ' ', city_name, value_str);
 
         float value = atoi(value_str);
 
@@ -99,12 +91,12 @@ void store_cities(city_vector_t* cities, char* cities_file){
         return;
     }
 
-    for (int i = 0; i < city_vector_size(cities); i++){
+    for (int i = 0; i < city_vector_quantity(cities); i++){
         char line[MAX_SIZE];
         city_t city = city_vector_get(cities, i);
-        sprintf(line, "%s %f", city_name(city), city_value(city));
+        sprintf(line, "%s %f\n", city_name(city), city_value(city));
         fwrite(line, sizeof(char), strlen(line), f);
     }
 
-    //city_vector_destroy(cities);
+    city_vector_destroy(cities);
 }

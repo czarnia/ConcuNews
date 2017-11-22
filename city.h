@@ -4,8 +4,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+#define MAX_STRING_SIZE 66
+
 typedef struct city{
-    char* name;
+    char name[MAX_STRING_SIZE];
     float value;
 } city_t;
 
@@ -27,8 +29,8 @@ float city_value(city_t city);
 
 //It creates a vector of cities.
 city_vector_t* city_vector_create();
-//Getter for the size of the city vector.
-size_t city_vector_size(city_vector_t* v);
+//It returns the number of items that the vector stores.
+size_t city_vector_quantity(city_vector_t* v);
 //It returns the city that it is stores in the posicion i of the vector.
 city_t city_vector_get(city_vector_t* v, size_t i);
 //It adds a new city to the vector in the last available position of it.
