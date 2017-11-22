@@ -7,38 +7,54 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+typedef enum _socket_type {
+	SOCK_ACTIVE = 0,
+	SOCK_PASSIVE
+} socket_type;
 
 typedef struct socket socket_t;
 
-//Crea un socket_t*
-void socket_crear(socket_t* self, int dominio, int tipo, int protocolo);
+/*
+ * Creates a new socket of the specified type
+ */
+socket_t* socket_create(socket_type type);
 
-//Destruye un socket_t*
+/*
+ * Closes and destroys a socket, freeing any addrinfo
+ */
 void socket_destroy(socket_t* self);
 
-//Le hace un shutdown a un socket_t*, devuelve <0 en caso de error
-int socket_shutdown(socket_t* self, int como);
+/*
+ * Attemps to bind the socket to a specific hostname and service.
+ */
+int socket_bind(socket_t* self, char* hostname, char* port);
 
-//Habilita al socket para escuchar, devuelve <0 en caso de error
-int socket_listen(socket_t* self, int conexiones);
+/*
+ * Puts a passive socket in a state ready to accept incomming connections.
+ */
+int socket_listen(socket_t* self, int backlog);
 
-//Hace un bind del socket, devuelve <0 en caso de error
-int socket_bind(socket_t* self, struct sockaddr* direccion, int tamanio);
+/*
+ * Blocks until a new connection is established and then retunrs a new to a new socket
+ */
+socket_t* socket_accept(socket_t* self);
 
-//Hace un accept del socket, devuelve <0 en caso de error
-int socket_accept(socket_t* self, struct sockaddr* dir_cliente, socket_t* skt);
+/*
+ * Attemps to connect to the hostname and port passed as parameters.
+ */
+int socket_conect(socket_t* self, char* hostname, char* port);
 
-//Hace un conect del socket, devuelve <0 en caso de error
-int socket_conect(socket_t* self, struct sockaddr* dir_server, int tamanio);
-
-//Hace un receive del socket, determinando cuanta informacion se piensa recibir
-//, devuelve <0 en caso de error
+/*
+ * Continously reads bytes from socket in a blocking fashion, until size bytes are
+ * read or an error occurs. Read bytes are stored on buffer.
+ */
 int socket_receive(socket_t* self, char* buffer, size_t tamanio);
 
-//Hace un send del socket, determinando cuanta informacion se piensa enviar,
-//devuelve <0 en caso de error
-int socket_send(socket_t* self, char* buffer, size_t tamanio);
-
+/*
+ * Continously write bytes to a socket, until size bytes are writen
+ * or an error occurs.
+ */
+int socket_send(socket_t* self, const char* buffer, size_t tamanio);
 
 
 #endif // _SOCKET_H
