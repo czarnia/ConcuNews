@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include <fcntl.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include <errno.h>
+
 #include "parser.h"
 
 #define END_LINE '\n'
@@ -15,8 +20,9 @@
 
 //----------------->Aux Functions<-----------------//
 
-void read_line(FILE* f, char* line){
-    char c = getc(f);
+void read_line(int f, char* line){
+    char c = 0;
+    read(f, &c, 1);
     int i = 0;
     for (i; i < MAX_SIZE && c != END_LINE; i++){
         if (c == EOF){
@@ -24,7 +30,7 @@ void read_line(FILE* f, char* line){
             return;
         }
         line[i] = c;
-        c = getc(f);
+	read(f, &c, 1);
     }
     line[i] = END_STRING;
 }
@@ -56,8 +62,11 @@ city_vector_t* get_cities(char* cities_file){
         return NULL;
     }
 
-    FILE* f = fopen(cities_file, "r");
-    if (!f){
+    printf("Trying to open: %s\n", cities_file);
+    int f = open(cities_file, O_RDONLY, 0666);
+
+    if (f < 0) {
+	printf("Failed get_cities open\n");
         return NULL;
     }
 
@@ -70,33 +79,38 @@ city_vector_t* get_cities(char* cities_file){
         char value_str[MAX_STRING_SIZE];
         split_values(line, ' ', city_name, value_str);
 
-        float value = atoi(value_str);
-
-        city_t city = city_create(city_name, value);
+        city_t city = city_create(city_name, value_str);
         if (!city_vector_add(cities, city)){
             city_vector_destroy(cities);
-            fclose(f);
+            close(f);
             return NULL;
         }
         read_line(f, line);
         i++;
     }
+    close(f);
     return cities;
 }
 
 void store_cities(city_vector_t* cities, char* cities_file){
-    FILE* f = fopen(cities_file, "w+");
+    printf("Trying to open: %s\n", cities_file);
+    int f = open(cities_file, O_CREAT || O_WRONLY || O_TRUNC, 0666);
 
-    if (!f){
+    if (f < 0) {
+	printf("Failed store_cities open: %d\n", errno);
         return;
     }
 
     for (int i = 0; i < city_vector_quantity(cities); i++){
         char line[MAX_SIZE];
         city_t city = city_vector_get(cities, i);
-        sprintf(line, "%s %f\n", city_name(city), city_value(city));
-        fwrite(line, sizeof(char), strlen(line), f);
+        sprintf(line, "%s %s\n", city_name(city), city_value(city));
+        int err = write(f, line, strlen(line));
+	if (err < 0)
+		printf("Holaaa\n");
     }
+
+    close(f);
 
     city_vector_destroy(cities);
 }

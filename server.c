@@ -45,6 +45,10 @@ void run_server(char* ip, char* port, handler_t callback, server_type type) {
 
 	printf("Creating socket\n");
 	socket_t* s = socket_create(SOCK_PASSIVE);
+	if (!s) {
+		printf("Error creating socket\n");
+		return;
+	}
 
 	printf("Binding socket\n");
 	int err = socket_bind(s, ip, port);

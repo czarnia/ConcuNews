@@ -106,7 +106,7 @@ int socket_bind(socket_t* self, char* hostname, char* port){
  * If set to 0 it is defaulted to BACKLOG_DEFAULT.
  */
 int socket_listen(socket_t* self, int backlog) {
-	assert(self->type = SOCK_PASSIVE);
+	assert(self->type == SOCK_PASSIVE);
 	if (!backlog) backlog = BACKLOG_DEFAULT;
 	return listen(self->sock, backlog);
 }
@@ -117,7 +117,7 @@ int socket_listen(socket_t* self, int backlog) {
  * Function socket_listen() must be called before socket_accept(), and the socket must be bound.
  */
 socket_t* socket_accept(socket_t* self) {
-	assert(self->type = SOCK_PASSIVE);
+	assert(self->type == SOCK_PASSIVE);
 
 	socket_t* new_sock = malloc(sizeof(socket_t));
 	if (!new_sock) return NULL;
@@ -140,7 +140,7 @@ socket_t* socket_accept(socket_t* self) {
  * Socket must be SOCK_ACTIVE to be able to start a connection.
  */
 int socket_conect(socket_t* self, char* hostname, char* port) {
-	assert(self->type = SOCK_ACTIVE);
+	assert(self->type == SOCK_ACTIVE);
 
 	struct addrinfo* ai;
 	int err = init_addrinfo(&ai, hostname, port);
