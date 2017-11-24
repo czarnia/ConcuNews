@@ -30,7 +30,7 @@ void read_line(int f, char* line){
             return;
         }
         line[i] = c;
-	read(f, &c, 1);
+        read(f, &c, 1);
     }
     line[i] = END_STRING;
 }
@@ -93,7 +93,8 @@ city_vector_t* get_cities(char* cities_file){
 }
 
 void store_cities(city_vector_t* cities, char* cities_file){
-    printf("Trying to open: %s\n", cities_file);
+
+  printf("Trying to open: %s\n", cities_file);
     int f = open(cities_file, O_CREAT || O_WRONLY || O_TRUNC, 0666);
 
     if (f < 0) {
