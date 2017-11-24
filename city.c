@@ -8,10 +8,10 @@
 
 //------------------->Functions City<-------------------//
 
-city_t city_create(char* name, float value){
+city_t city_create(char* name, char* value){
     city_t city;
     strcpy(city.name, name);
-    city.value = value;
+    strcpy(city.value, value);
     return city;
 }
 
@@ -21,18 +21,20 @@ char* city_name(city_t city){
     return str_aux;
 }
 
-float city_value(city_t city){
-    return city.value;
+char* city_value(city_t city){
+    static char str_aux[100];
+    strcpy(str_aux, city.value);
+    return str_aux;
 }
 
 //------------------->Functions City vector<-------------------//
 
 city_vector_t* city_vector_create(){
-    city_vector_t* vector = calloc(1, sizeof(city_vector_t));
+    city_vector_t* vector = malloc(sizeof(city_vector_t));
     if (!vector){
         return NULL;
     }
-    vector->vec = calloc(INI_SIZE, sizeof(city_t));
+    vector->vec = malloc(INI_SIZE * sizeof(city_t));
     if (!vector->vec){
         return NULL;
     }
@@ -49,7 +51,20 @@ city_t city_vector_get(city_vector_t* v, size_t i){
     return v->vec[i];
 }
 
+int city_vector_get_by_name(city_vector_t* v, char* city_name) {
+	printf("Getting city by name!\n");
+	printf("%zu\n", v->quantity);
+	for (int i = 0; i < v->quantity; i++) {
+		printf("%s - %s\n", city_name, v->vec[i].name);
+		if (strcmp(city_name, v->vec[i].name) == 0) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 bool city_vector_add(city_vector_t* v, city_t city){
+    printf("Adding city by name!\n");
     if (v->size == v->quantity){
         city_t* new_vec = realloc(v->vec, sizeof(city_t)*v->quantity*2);
         if (!new_vec){
