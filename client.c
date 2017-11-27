@@ -8,9 +8,7 @@
 #include <assert.h>
 
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT "16001"
-
-
+#define SERVER_PORT "16000"
 
 
 int main(int argc, char* argv[]) {
@@ -29,16 +27,16 @@ int main(int argc, char* argv[]) {
 		return -1;
 	}
 
-	service_msg_t msg = { MSG_RETRIEVE, "BuenosAires", "" };
+	server_msg_t msg = { MSG_RETRIEVE, ROLE_USER, SVC_TEMPERATURE, "BuenosAires", "" };
 
-	err = SOCK_SEND(s, service_msg_t, msg);
+	err = SOCK_SEND(s, server_msg_t, msg);
 	if (err < 0) {
 		printf("Error sending message\n");
 		socket_destroy(s);
 		return -1;
 	}
 
-	err = SOCK_RECV(s, service_msg_t, msg);
+	err = SOCK_RECV(s, server_msg_t, msg);
 	if (err < 0) {
 		printf("Error receiving message\n");
 		socket_destroy(s);

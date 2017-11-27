@@ -12,6 +12,12 @@ main: $(DEPS) main.c
 currency_service: $(DEPS) currency_service.c
 	$(GCC) $(CFLAGS) $^ -o $@
 
+temperature_service: $(DEPS) temperature_service.c
+	$(GCC) $(CFLAGS) $^ -o $@
+
+main_server: $(DEPS) main_server.c
+	$(GCC) $(CFLAGS) $^ -o $@
+
 client: $(DEPS) client.c
 	$(GCC) $(CFLAGS) $^ -o $@
 
