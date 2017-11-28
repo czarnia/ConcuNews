@@ -28,18 +28,27 @@ void service_handlder(socket_t* s, char* path) {
 			msg.type = MSG_RESPONSE;
 			printf("City: %s, Currency: %s\n", msg.city_name, msg.city_value);
 			err = SOCK_SEND(s, service_msg_t, msg);
+		} else {
+			msg.type = MSG_ERROR;
+			err = SOCK_SEND(s, service_msg_t, msg);
 		}
 		city_vector_destroy(cities);
 	} else if (msg.type == MSG_STORE) {
 		printf("Service says: It's a store!\n");
 		city_t city = city_create(msg.city_name, msg.city_value);
-		city_vector_add(cities, city);
+		if (!city_vector_add(cities, city)) {
+			msg.type = MSG_ERROR;
+			err = SOCK_SEND(s, service_msg_t, msg);
+			return;
+		}
 
 		store_cities(cities, path);
 
 		msg.type = MSG_RESPONSE;
 		err = SOCK_SEND(s, service_msg_t, msg);
 	} else {
+		msg.type = MSG_ERROR;
+		err = SOCK_SEND(s, service_msg_t, msg);
 		printf("Service handler type error\n");
 		city_vector_destroy(cities);
 	}

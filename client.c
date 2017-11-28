@@ -23,6 +23,10 @@
 static const server_msg_t EMPTY_MSG = { 0 };
 
 void print_msg(server_msg_t* msg) {
+	if (msg->type == MSG_ERROR) {
+		printf("Something went reaaaly wrong\n");
+		return;
+	}
 	printf("\tCity: %s, Value: %s\n", msg->city_name, msg->city_value);
 	printf("\tService: %d, Role: %d\n", msg->service, msg->role);
 }
@@ -125,7 +129,7 @@ int main(int argc, char* argv[]) {
 	printf("Destroying socket\n");
 	socket_destroy(s);
 
-	assert(msg->type == MSG_RESPONSE);
+	//assert(msg->type == MSG_RESPONSE);
 	print_msg(msg);
 	free(msg);
 
