@@ -49,7 +49,7 @@ void new_client(socket_t* s) {
 		return;
 	}
 
-  service_msg_t msg_svc;
+  service_msg_t msg_svc = { 0 };
   strcpy(msg_svc.city_name, msg.city_name);
   strcpy(msg_svc.city_value, msg.city_value);
   msg_svc.type = msg.type;
