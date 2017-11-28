@@ -6,6 +6,8 @@ DEPS := socket.o server.o city.o parser.o service.o
 
 .PHONY: clean valgrind
 
+all: client main_server temperature_service currency_service
+
 main: $(DEPS) main.c
 	$(GCC) $(CFLAGS) $^ -o $@
 
