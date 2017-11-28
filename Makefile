@@ -27,8 +27,11 @@ echo: $(DEPS) echo.c
 %.o: %.c %.h
 	$(GCC) $(CFLAGS) -c $^
 
-valgrind: main
-	valgrind $(VFLAGS) ./main
+valgrind: client main_server temperature_service currency_service
+	valgrind $(VFLAGS) ./temperature_service &
+	valgrind $(VFLAGS) ./currency_service &
+	valgrind $(VFLAGS) ./main_server &
+	valgrind $(VFLAGS) ./client
 
 clean:
 	rm -f *.o

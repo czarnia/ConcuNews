@@ -9,9 +9,9 @@
 #include <stdio.h>
 
 #define SERVER_IP "127.0.0.1"
-#define SERVER_PORT "16000"
+#define SERVER_PORT "16007"
 
-#define CURRENCY_PORT "16001"
+#define CURRENCY_PORT "16003"
 #define TEMPERATURE_PORT "16002"
 
 void new_client(socket_t* s) {

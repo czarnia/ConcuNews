@@ -20,7 +20,8 @@ typedef enum _role {
 } role_t;
 
 typedef enum _service {
-	SVC_CURRENCY = 0,
+	SVC_INVALID = 0,
+	SVC_CURRENCY,
 	SVC_TEMPERATURE
 } service_t;
 
