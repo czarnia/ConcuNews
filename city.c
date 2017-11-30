@@ -64,17 +64,23 @@ int city_vector_get_by_name(city_vector_t* v, char* city_name) {
 }
 
 bool city_vector_add(city_vector_t* v, city_t city){
-    printf("Adding city by name!\n");
-    if (v->size == v->quantity){
-        city_t* new_vec = realloc(v->vec, sizeof(city_t)*v->quantity*2);
-        if (!new_vec){
-            return false;
-        }
-        v->vec = new_vec;
-    }
-    v->vec[v->quantity] = city;
-    v->quantity++;
-    return true;
+	int index = city_vector_get_by_name(v, city.name);
+	if (index >= 0) {
+		strcpy(v->vec[index].value, city.value);
+		return true;
+	}
+
+
+	if (v->size == v->quantity){
+		city_t* new_vec = realloc(v->vec, sizeof(city_t)*v->quantity*2);
+		if (!new_vec){
+			return false;
+		}
+		v->vec = new_vec;
+	}
+	v->vec[v->quantity] = city;
+	v->quantity++;
+	return true;
 }
 
 void city_vector_destroy(city_vector_t* v){
